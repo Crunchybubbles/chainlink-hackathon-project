@@ -1,0 +1,7 @@
+dotenv: .env
+
+networks:
+  kovan:
+    gas_limit: max
+    gas_buffer: 1.1
+    gas_price: 2
