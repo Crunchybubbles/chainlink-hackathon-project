@@ -13,6 +13,7 @@ contract CreatureFactory is VRFConsumerBase {
   mapping(uint => address) public idToOwner;
   mapping(bytes32 => address) public requestIdTorequester;
   mapping(string => uint) public nameToId;
+  mapping(address => uint) public linkBalance;
 
   uint public creatureCount;
 
@@ -45,6 +46,18 @@ contract CreatureFactory is VRFConsumerBase {
   }
 
 
+
+  function depositLink(uint _amount) public {
+    LINK.transferFrom(msg.sender, address(this), _amount);
+    linkBalance[msg.sender] = _amount;
+  }
+
+  function withdrawLink() public {
+    LINK.transferFrom(address(this), msg.sender, linkBalance[msg.sender]);
+    linkBalance[msg.sender] = 0;
+  }
+
+
   function createRandomCreature() public returns (bytes32 requestId) {
     return requestRandomness(keyHash, fee);
   }
@@ -69,6 +82,7 @@ contract CreatureFactory is VRFConsumerBase {
   }
 
   function nameCreature(uint _id, string calldata _name) public {
+    require(idToOwner[_id] == msg.sender);
     require(nameToId[_name] == 0);
     nameToId[_name] = _id;
     idToCreature[_id].name = _name;
