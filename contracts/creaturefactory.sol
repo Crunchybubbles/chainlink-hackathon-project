@@ -15,13 +15,16 @@ contract CreatureFactory is VRFConsumerBase {
   mapping(string => uint) public nameToId;
   mapping(address => uint) public linkBalance;
 
+
   uint public creatureCount;
+
+  address public ItemFactory;
 
 
   struct Creature {
     string name;
     uint id;
-    uint health;
+    uint hp;
     uint atk;
     uint def;
     uint spd;
@@ -45,20 +48,21 @@ contract CreatureFactory is VRFConsumerBase {
     creatureCount = 1;
   }
 
-
-
-  function depositLink(uint _amount) public {
-    LINK.transferFrom(msg.sender, address(this), _amount);
-    linkBalance[msg.sender] = _amount;
+  function approveLink(uint _amount) public {
+    LINK.approve(ItemFactory, _amount);
   }
 
-  function withdrawLink() public {
-    LINK.transferFrom(address(this), msg.sender, linkBalance[msg.sender]);
-    linkBalance[msg.sender] = 0;
+  function depositLink(uint _amount) external {
+    require(LINK.transferFrom(msg.sender, address(this), _amount));
+    linkBalance[msg.sender] += _amount;
+
   }
 
 
-  function createRandomCreature() public returns (bytes32 requestId) {
+
+  function createRandomCreature() external returns (bytes32 requestId) {
+    require(linkBalance[msg.sender] >= fee);
+    linkBalance[msg.sender] -= fee;
     return requestRandomness(keyHash, fee);
   }
 
@@ -70,21 +74,33 @@ contract CreatureFactory is VRFConsumerBase {
 
   function newCreature(uint _randomseed, bytes32 requestId) private {
     uint seed = _randomseed % 1000;
-    uint health = ((seed / 1000) % 10) + 5;
+    uint hp = ((seed / 1000) % 10) + 5;
     uint atk = ((seed / 100) % 10) + 1;
     uint def = ((seed / 10) % 10) + 1;
     uint spd = (seed  % 10) + 1;
     uint id = creatureCount;
     Item memory zeroItem;
-    idToCreature[id] = Creature("", id, health, atk, def, spd, zeroItem);
+    idToCreature[id] = Creature("", id, hp, atk, def, spd, zeroItem);
     idToOwner[id] = requestIdTorequester[requestId];
     creatureCount++;
   }
 
-  function nameCreature(uint _id, string calldata _name) public {
+  function nameCreature(uint _id, string calldata _name) external {
     require(idToOwner[_id] == msg.sender);
     require(nameToId[_name] == 0);
     nameToId[_name] = _id;
     idToCreature[_id].name = _name;
+  }
+
+  function balanceOf(address _account) external returns (uint amount) {
+    amount = linkBalance[_account];
+  }
+
+  function setItemFactory(address _itemfacaddr) public {
+    ItemFactory = _itemfacaddr;
+  }
+
+  function newBalance(address _account) external {
+    linkBalance[_account] -= fee;
   }
 }
