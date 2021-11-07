@@ -3,6 +3,17 @@ pragma solidity ^0.8.7;
 import "smartcontractkit/chainlink@1.0.0/contracts/src/v0.8/VRFConsumerBase.sol";
 
 
+
+
+interface gameBrainInterface {
+  function depositLink(uint _amount) external;
+
+  function balanceOf(address _account) external returns (uint amount);
+
+  function newBalance(address _account) external;
+}
+
+
 contract CreatureFactory is VRFConsumerBase {
 
   bytes32 internal keyHash;
@@ -13,12 +24,14 @@ contract CreatureFactory is VRFConsumerBase {
   mapping(uint => address) public idToOwner;
   mapping(bytes32 => address) public requestIdTorequester;
   mapping(string => uint) public nameToId;
-  mapping(address => uint) public linkBalance;
+
+  address public gameBrain;
+  gameBrainInterface internal brain;
+
 
 
   uint public creatureCount;
 
-  address public ItemFactory;
 
 
   struct Creature {
@@ -41,28 +54,19 @@ contract CreatureFactory is VRFConsumerBase {
   }
 
 
-  constructor(address _vrfcoordinator, address _link)
+  constructor(address _vrfcoordinator, address _link, address _gamebrain)
     VRFConsumerBase(_vrfcoordinator, _link) public {
     keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
     fee = 100000000000000000;
     creatureCount = 1;
+    brain = gameBrainInterface(_gamebrain);
   }
-
-  function approveLink(uint _amount) public {
-    LINK.approve(ItemFactory, _amount);
-  }
-
-  function depositLink(uint _amount) external {
-    require(LINK.transferFrom(msg.sender, address(this), _amount));
-    linkBalance[msg.sender] += _amount;
-
-  }
-
 
 
   function createRandomCreature() external returns (bytes32 requestId) {
-    require(linkBalance[msg.sender] >= fee);
-    linkBalance[msg.sender] -= fee;
+    require(brain.balanceOf(msg.sender) >= fee);
+    brain.newBalance(msg.sender);
+    LINK.transferFrom(gameBrain, address(this), fee);
     return requestRandomness(keyHash, fee);
   }
 
@@ -90,17 +94,5 @@ contract CreatureFactory is VRFConsumerBase {
     require(nameToId[_name] == 0);
     nameToId[_name] = _id;
     idToCreature[_id].name = _name;
-  }
-
-  function balanceOf(address _account) external returns (uint amount) {
-    amount = linkBalance[_account];
-  }
-
-  function setItemFactory(address _itemfacaddr) public {
-    ItemFactory = _itemfacaddr;
-  }
-
-  function newBalance(address _account) external {
-    linkBalance[_account] -= fee;
   }
 }
