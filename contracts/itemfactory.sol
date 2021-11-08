@@ -17,6 +17,8 @@ interface gameBrainInterface {
 contract ItemFactory is VRFConsumerBase {
 
   mapping(bytes32 => address) public requestIdTorequester;
+  mapping(uint => Item) public itemIdToItem;
+  mapping(uint => address) public itemIdToOwner;
 
   uint public rando;
 
@@ -56,6 +58,62 @@ contract ItemFactory is VRFConsumerBase {
 
 
   function fulfillRandomness(bytes32 requestId, uint randomness) internal override {
-    rando = randomness;
+    newItem(randomness, requestId);
   }
+
+  function newItem(uint _seed, bytes32 _requestId) private {
+    uint tier = _tier(_seed);
+
+    uint id = itemCount;
+    itemIdToItem[id] = Item(id, 0, 0, 0, 0);
+    itemIdToOwner[id] = requestIdTorequester[_requestId];
+    itemCount++;
+
+
+
+  }
+
+  function _tier(uint seed) private returns (uint tier) {
+    seed = (seed / 1000000000) % 1000;
+
+    uint n = 1000;
+    uint s = 3;
+
+    if (seed < n-8**s) {
+      tier = 0;
+    }
+
+    if (seed < n-7**s && seed >= n-8**s) {
+      tier = 1;
+    }
+
+    if (seed < n-6**s && seed >= n-7**s) {
+      tier = 2;
+    }
+
+    if (seed < n-5**s && seed >= n-6**s) {
+      tier = 3;
+    }
+
+    if (seed < n-4**s && seed >= n-5**s) {
+      tier = 4;
+    }
+
+    if (seed < n-3**s && seed >= n-4**s) {
+      tier = 5;
+    }
+
+    if (seed < n-2**s && seed >= n-3**s) {
+      tier = 6;
+    }
+
+    if (seed < n-s && seed >= n-2**s) {
+      tier = 7;
+    }
+
+    if (seed >= n-s) {
+      tier = 8;
+    }
+  }
+
 }
