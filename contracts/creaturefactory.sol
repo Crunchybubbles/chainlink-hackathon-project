@@ -62,8 +62,10 @@ contract CreatureFactory is VRFConsumerBase {
     brain = gameBrainInterface(_gamebrain);
   }
 
+  /* couldnt create creature changed function from external to public because items gen is "working" and is a public function*/
 
-  function createRandomCreature() external returns (bytes32 requestId) {
+
+  function createRandomCreature() public returns (bytes32 requestId) {
     require(brain.balanceOf(msg.sender) >= fee);
     brain.newBalance(msg.sender);
     LINK.transferFrom(gameBrain, address(this), fee);
