@@ -13,15 +13,15 @@ def approveLink(amount, to, token_addr, myacc):
 
 def linkdeposit(amount, contract, token, myacc):
     approveLink(amount, contract, token, myacc)
-    depo_tx = test_contract.depositLink(amount, {"from": myacc})
+    depo_tx = gameBrain.depositLink(amount, {"from": myacc})
     depo_tx.wait(1)
     return depo_tx
 
 def main():
     test_acc = accounts.load("testacc")
     gameBrain = GameBrain.deploy(link_addr, {"from": test_acc})
-    creatureFactory = CreatureFactory.deploy(vrf, link_addr, gameBrain.address, {"from": test_acc})
     itemFactory = ItemFactory.deploy(vrf, link_addr, gameBrain.address, {"from": test_acc})
+    creatureFactory = CreatureFactory.deploy(vrf, link_addr, gameBrain.address, itemFactory.address, {"from": test_acc})
     healthToken = HealthToken.deploy(itemFactory.address, {"from": test_acc})
     attackToken = AttackToken.deploy(itemFactory.address, {"from": test_acc})
     defenseToken = DefenseToken.deploy(itemFactory.address, {"from": test_acc})
@@ -35,6 +35,20 @@ def main():
     itemFactory.setDefenseToken(defenseToken.address, {"from": test_acc})
     itemFactory.setSpeedToken(speedToken.address, {"from": test_acc})
 
-    creatureFactory.createRandomCreature({"from": test_acc})
-    itemFactory.increaseMintableQuant(test_acc, {"from": test_acc})
-    itemFactory.createRandomItem({"from": test_acc})
+    # creatureFactory.createRandomCreature({"from": test_acc})
+    # itemFactory.increaseMintableQuant(test_acc, {"from": test_acc})
+    # itemFactory.createRandomItem({"from": test_acc})
+
+    amount = 1000000000000000000
+    approveLink(amount, gameBrain.address, link_addr, test_acc)
+    gameBrain.depositLink(amount, {"from": test_acc})
+
+    gameBrain.approveLink(amount/2, creatureFactory.address, {"from": test_acc})
+    gameBrain.approveLink(amount/2, itemFactory.address, {"from": test_acc})
+
+
+
+    for i in range(5):
+        creatureFactory.createRandomCreature({"from": test_acc})
+        itemFactory.increaseMintableQuant(test_acc, {"from": test_acc})
+        itemFactory.createRandomItem({"from": test_acc})

@@ -19,7 +19,7 @@ interface gameTokens {
 contract ItemFactory is VRFConsumerBase {
 
   mapping(bytes32 => address) public requestIdTorequester;
-  mapping(uint => Item) public itemIdToItem;
+  mapping(uint => ItemfromFac) public itemIdToItem;
   mapping(uint => address) public itemIdToOwner;
   mapping(address => uint) public playerToMintableQuant;
 
@@ -43,7 +43,7 @@ contract ItemFactory is VRFConsumerBase {
   gameBrainInterface internal brain;
 
 
-  struct Item {
+  struct ItemfromFac {
     uint id;
     uint hp;
     uint atk;
@@ -110,7 +110,8 @@ contract ItemFactory is VRFConsumerBase {
     require(brain.balanceOf(msg.sender) >= fee);
     brain.newBalance(msg.sender);
     LINK.transferFrom(gameBrain, address(this), fee);
-    return requestRandomness(keyHash, fee);
+    bytes32 requestId = requestRandomness(keyHash, fee);
+    requestIdTorequester[requestId] = msg.sender;
   }
 
 
@@ -118,7 +119,6 @@ contract ItemFactory is VRFConsumerBase {
     newItem(randomness, requestId);
   }
 
-  /* the minting of tokens when tier == 0 didnt work. i think its because requestIdTorequester is returning the 0 address */
 
   function newItem(uint _seed, bytes32 _requestId) private {
     uint tier = _tier(_seed);
@@ -127,7 +127,7 @@ contract ItemFactory is VRFConsumerBase {
       mintTokens(requestIdTorequester[_requestId], 1);
     } else {
       uint id = itemCount;
-      Item memory randItemStats = _itemStats(_seed);
+      ItemfromFac memory randItemStats = _itemStats(_seed);
       uint[4] memory item;
       uint[4] memory tieredStatArray = [randItemStats.hp, randItemStats.atk, randItemStats.def, randItemStats.spd];
       for (uint i; i < tier; i++) {
@@ -135,13 +135,13 @@ contract ItemFactory is VRFConsumerBase {
         uint num = (_seed / digits) % 4;
         item[num] = (item[num] + tieredStatArray[num] + tier);
       }
-      itemIdToItem[id] = Item(id, item[0], item[1], item[2], item[3]);
+      itemIdToItem[id] = ItemfromFac(id, item[0], item[1], item[2], item[3]);
       itemIdToOwner[id] = requestIdTorequester[_requestId];
       itemCount++;
     }
   }
 
-  function _itemStats(uint seed) private pure returns(Item memory randoItem) {
+  function _itemStats(uint seed) private pure returns(ItemfromFac memory randoItem) {
     seed = seed % 10000;
     uint hp = seed / 10000;
     if (hp == 0) {
@@ -160,7 +160,7 @@ contract ItemFactory is VRFConsumerBase {
       spd = 1;
     }
 
-    randoItem = Item(0,hp, atk, def, spd);
+    randoItem = ItemfromFac(0,hp, atk, def, spd);
   }
 
   /* too many non zero tier items being generated out of 10 attempts 7 lead to items */
@@ -213,6 +213,14 @@ contract ItemFactory is VRFConsumerBase {
     AttackToken.mintToken(_player, _amount);
     DefenseToken.mintToken(_player, _amount);
     SpeedToken.mintToken(_player, _amount);
+  }
+
+  function getItemData(uint _id) external returns (ItemfromFac memory requestedItem) {
+    requestedItem = itemIdToItem[_id];
+  }
+
+  function getItemOwner(uint _id) external returns (address itemOwner) {
+    itemOwner = itemIdToOwner[_id];
   }
 
 }

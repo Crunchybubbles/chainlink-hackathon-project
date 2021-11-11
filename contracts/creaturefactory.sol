@@ -13,6 +13,14 @@ interface gameBrainInterface {
   function newBalance(address _account) external;
 }
 
+interface itemFactoryInterface {
+  struct ItemfromFac {uint id; uint hp; uint atk; uint def; uint spd; }
+
+  function getItemData(uint _id) external returns (ItemfromFac memory requestedItem);
+
+  function getItemOwner(uint _id) external returns (address itemOwner);
+}
+
 
 contract CreatureFactory is VRFConsumerBase {
 
@@ -27,6 +35,8 @@ contract CreatureFactory is VRFConsumerBase {
 
   address public gameBrain;
   gameBrainInterface internal brain;
+
+  itemFactoryInterface internal itemFac;
 
 
 
@@ -47,29 +57,29 @@ contract CreatureFactory is VRFConsumerBase {
 
   struct Item {
     uint id;
-    uint health;
+    uint hp;
     uint atk;
     uint def;
     uint spd;
   }
 
 
-  constructor(address _vrfcoordinator, address _link, address _gamebrain)
+  constructor(address _vrfcoordinator, address _link, address _gamebrain, address _itemfacaddr)
     VRFConsumerBase(_vrfcoordinator, _link) public {
     keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
     fee = 100000000000000000;
     creatureCount = 1;
+    gameBrain = _gamebrain;
     brain = gameBrainInterface(_gamebrain);
+    itemFac = itemFactoryInterface(_itemfacaddr);
   }
-
-  /* couldnt create creature changed function from external to public because items gen is "working" and is a public function*/
-
 
   function createRandomCreature() public returns (bytes32 requestId) {
     require(brain.balanceOf(msg.sender) >= fee);
     brain.newBalance(msg.sender);
     LINK.transferFrom(gameBrain, address(this), fee);
-    return requestRandomness(keyHash, fee);
+    bytes32 requestId = requestRandomness(keyHash, fee);
+    requestIdTorequester[requestId] = msg.sender;
   }
 
 
@@ -96,5 +106,13 @@ contract CreatureFactory is VRFConsumerBase {
     require(nameToId[_name] == 0);
     nameToId[_name] = _id;
     idToCreature[_id].name = _name;
+  }
+
+  function equipItem(uint _creatureId, uint _itemId) public {
+    require(itemFac.getItemOwner(_itemId) == msg.sender);
+    Creature memory creature = idToCreature[_creatureId];
+    ItemfromFac memory itm = itemFac.getItemData(_itemId);
+    creature.item = Item(itm.id, itm.hp, itm.atk, itm.def, itm.spd);
+    idToCreature[_creatureId] = creature;
   }
 }
