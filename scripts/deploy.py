@@ -34,6 +34,7 @@ def main():
     itemFactory.setAttackToken(attackToken.address, {"from": test_acc})
     itemFactory.setDefenseToken(defenseToken.address, {"from": test_acc})
     itemFactory.setSpeedToken(speedToken.address, {"from": test_acc})
+    itemFactory.setCreatureFactory(creatureFactory.address, {"from": test_acc})
 
     # creatureFactory.createRandomCreature({"from": test_acc})
     # itemFactory.increaseMintableQuant(test_acc, {"from": test_acc})

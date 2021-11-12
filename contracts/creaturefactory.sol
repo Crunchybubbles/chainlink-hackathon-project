@@ -14,11 +14,11 @@ interface gameBrainInterface {
 }
 
 interface itemFactoryInterface {
-  struct ItemfromFac {uint id; uint hp; uint atk; uint def; uint spd; }
-
-  function getItemData(uint _id) external returns (ItemfromFac memory requestedItem);
+  function getItemData(uint _id) external returns (uint id, uint hp, uint atk, uint def, uint spd);
 
   function getItemOwner(uint _id) external returns (address itemOwner);
+
+  function unequip(uint _id) external;
 }
 
 
@@ -89,7 +89,7 @@ contract CreatureFactory is VRFConsumerBase {
 
 
   function newCreature(uint _randomseed, bytes32 requestId) private {
-    uint seed = _randomseed % 1000;
+    uint seed = _randomseed % 10000;
     uint hp = ((seed / 1000) % 10) + 5;
     uint atk = ((seed / 100) % 10) + 1;
     uint def = ((seed / 10) % 10) + 1;
@@ -111,8 +111,18 @@ contract CreatureFactory is VRFConsumerBase {
   function equipItem(uint _creatureId, uint _itemId) public {
     require(itemFac.getItemOwner(_itemId) == msg.sender);
     Creature memory creature = idToCreature[_creatureId];
-    ItemfromFac memory itm = itemFac.getItemData(_itemId);
+    Item memory itm;
+    (itm.id, itm.hp, itm.atk, itm.def, itm.spd) =  itemFac.getItemData(_itemId);
     creature.item = Item(itm.id, itm.hp, itm.atk, itm.def, itm.spd);
     idToCreature[_creatureId] = creature;
+  }
+
+  function unequipItem(uint _creatureId, uint _itemId) public {
+    require(itemFac.getItemOwner(_itemId) == msg.sender);
+    Item memory zeroItem;
+    Creature memory creature = idToCreature[_creatureId];
+    creature.item = zeroItem;
+    idToCreature[_creatureId] = creature;
+    itemFac.unequip(_itemId);
   }
 }

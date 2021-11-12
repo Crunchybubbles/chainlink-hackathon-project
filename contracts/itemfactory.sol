@@ -1,5 +1,6 @@
 pragma solidity ^0.8.7;
 
+
 import "smartcontractkit/chainlink@1.0.0/contracts/src/v0.8/VRFConsumerBase.sol";
 
 
@@ -19,9 +20,10 @@ interface gameTokens {
 contract ItemFactory is VRFConsumerBase {
 
   mapping(bytes32 => address) public requestIdTorequester;
-  mapping(uint => ItemfromFac) public itemIdToItem;
+  mapping(uint => Item) public itemIdToItem;
   mapping(uint => address) public itemIdToOwner;
   mapping(address => uint) public playerToMintableQuant;
+  mapping(uint => bool) public itemIdToisEquiped;
 
   gameTokens internal HealthToken;
   gameTokens internal AttackToken;
@@ -29,6 +31,7 @@ contract ItemFactory is VRFConsumerBase {
   gameTokens internal SpeedToken;
 
   address public owner;
+  address public creatureFactory;
 
 
   uint public rando;
@@ -43,7 +46,9 @@ contract ItemFactory is VRFConsumerBase {
   gameBrainInterface internal brain;
 
 
-  struct ItemfromFac {
+
+
+  struct Item {
     uint id;
     uint hp;
     uint atk;
@@ -65,6 +70,14 @@ contract ItemFactory is VRFConsumerBase {
       revert("not owner");
     } else {
       _;
+    }
+  }
+
+  modifier onlyCreatureFac {
+    if (msg.sender == creatureFactory) {
+      _;
+    } else {
+      revert("not authorized");
     }
   }
 
@@ -127,7 +140,7 @@ contract ItemFactory is VRFConsumerBase {
       mintTokens(requestIdTorequester[_requestId], 1);
     } else {
       uint id = itemCount;
-      ItemfromFac memory randItemStats = _itemStats(_seed);
+      Item memory randItemStats = _itemStats(_seed);
       uint[4] memory item;
       uint[4] memory tieredStatArray = [randItemStats.hp, randItemStats.atk, randItemStats.def, randItemStats.spd];
       for (uint i; i < tier; i++) {
@@ -135,13 +148,13 @@ contract ItemFactory is VRFConsumerBase {
         uint num = (_seed / digits) % 4;
         item[num] = (item[num] + tieredStatArray[num] + tier);
       }
-      itemIdToItem[id] = ItemfromFac(id, item[0], item[1], item[2], item[3]);
+      itemIdToItem[id] = Item(id, item[0], item[1], item[2], item[3]);
       itemIdToOwner[id] = requestIdTorequester[_requestId];
       itemCount++;
     }
   }
 
-  function _itemStats(uint seed) private pure returns(ItemfromFac memory randoItem) {
+  function _itemStats(uint seed) private pure returns(Item memory randoItem) {
     seed = seed % 10000;
     uint hp = seed / 10000;
     if (hp == 0) {
@@ -160,7 +173,7 @@ contract ItemFactory is VRFConsumerBase {
       spd = 1;
     }
 
-    randoItem = ItemfromFac(0,hp, atk, def, spd);
+    randoItem = Item(0,hp, atk, def, spd);
   }
 
   /* too many non zero tier items being generated out of 10 attempts 7 lead to items */
@@ -215,12 +228,27 @@ contract ItemFactory is VRFConsumerBase {
     SpeedToken.mintToken(_player, _amount);
   }
 
-  function getItemData(uint _id) external returns (ItemfromFac memory requestedItem) {
-    requestedItem = itemIdToItem[_id];
+  function getItemData(uint _id) external returns (uint id, uint hp, uint atk, uint def, uint spd) {
+    require(itemIdToisEquiped[_id] == false);
+    Item memory requestedItem = itemIdToItem[_id];
+    id = requestedItem.id;
+    hp = requestedItem.hp;
+    atk = requestedItem.atk;
+    def = requestedItem.def;
+    spd = requestedItem.spd;
+    itemIdToisEquiped[_id] = true;
   }
 
   function getItemOwner(uint _id) external returns (address itemOwner) {
     itemOwner = itemIdToOwner[_id];
+  }
+
+  function unequip(uint _id) external onlyCreatureFac {
+    itemIdToisEquiped[_id] = false;
+  }
+
+  function setCreatureFactory(address _creatureFactory) public onlyOwner {
+    creatureFactory = _creatureFactory;
   }
 
 }
