@@ -109,7 +109,7 @@ contract CreatureFactory is VRFConsumerBase {
   }
 
   function equipItem(uint _creatureId, uint _itemId) public {
-    require(itemFac.getItemOwner(_itemId) == msg.sender);
+    require(itemFac.getItemOwner(_itemId) == idToOwner[_creatureId]);
     Creature memory creature = idToCreature[_creatureId];
     Item memory itm;
     (itm.id, itm.hp, itm.atk, itm.def, itm.spd) =  itemFac.getItemData(_itemId);
@@ -118,11 +118,25 @@ contract CreatureFactory is VRFConsumerBase {
   }
 
   function unequipItem(uint _creatureId, uint _itemId) public {
-    require(itemFac.getItemOwner(_itemId) == msg.sender);
+    require(itemFac.getItemOwner(_itemId) == idToOwner[_creatureId]);
     Item memory zeroItem;
     Creature memory creature = idToCreature[_creatureId];
     creature.item = zeroItem;
     idToCreature[_creatureId] = creature;
     itemFac.unequip(_itemId);
+  }
+
+  function getCreatureData(uint _id) external returns (string memory name, uint id, uint hp, uint atk, uint def, uint spd) {
+      Creature memory myCreature = idToCreature[_id];
+      name = myCreature.name;
+      id = myCreature.id;
+      hp = myCreature.hp + myCreature.item.hp;
+      atk = myCreature.atk + myCreature.item.atk;
+      def = myCreature.def + myCreature.item.def;
+      spd = myCreature.spd + myCreature.item.spd;
+  }
+
+  function getCreatureOwner(uint _id) external returns (address _owner) {
+    _owner = idToOwner[_id];
   }
 }
