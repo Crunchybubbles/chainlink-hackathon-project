@@ -19,6 +19,8 @@ interface itemFactoryInterface {
   function getItemOwner(uint _id) external returns (address itemOwner);
 
   function unequip(uint _id) external;
+
+  function deleteItem(uint _id) external;
 }
 
 
@@ -38,9 +40,14 @@ contract CreatureFactory is VRFConsumerBase {
 
   itemFactoryInterface internal itemFac;
 
+  address public BattleLogic;
 
 
   uint public creatureCount;
+
+  address owner;
+
+  event CreatureDeleted(Creature deadCreature);
 
 
 
@@ -72,6 +79,7 @@ contract CreatureFactory is VRFConsumerBase {
     gameBrain = _gamebrain;
     brain = gameBrainInterface(_gamebrain);
     itemFac = itemFactoryInterface(_itemfacaddr);
+    owner = msg.sender;
   }
 
   function createRandomCreature() public returns (bytes32 requestId) {
@@ -139,4 +147,23 @@ contract CreatureFactory is VRFConsumerBase {
   function getCreatureOwner(uint _id) external returns (address _owner) {
     _owner = idToOwner[_id];
   }
+
+  function setBattleLogic(address _battleLogic) public {
+    require(msg.sender == owner);
+  }
+
+  function deleteCreature(uint _id) external {
+    require(msg.sender == BattleLogic);
+    Creature memory zeroCreature;
+    address zeroAddr;
+    Creature memory toBeDeleted = idToCreature[_id];
+    if (toBeDeleted.item.id != 0) {
+      itemFac.deleteItem(toBeDeleted.item.id);
+    } else {
+      idToCreature[_id] = zeroCreature;
+      idToOwner[_id] = zeroAddr;
+    }
+    emit CreatureDeleted(toBeDeleted);
+  }
+
 }

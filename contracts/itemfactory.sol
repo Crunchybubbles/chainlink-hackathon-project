@@ -45,6 +45,7 @@ contract ItemFactory is VRFConsumerBase {
 
   gameBrainInterface internal brain;
 
+  event ItemDeleted(Item deletedItem);
 
 
 
@@ -249,6 +250,14 @@ contract ItemFactory is VRFConsumerBase {
 
   function setCreatureFactory(address _creatureFactory) public onlyOwner {
     creatureFactory = _creatureFactory;
+  }
+
+  function deleteItem(uint _id) external onlyCreatureFac {
+    Item memory zeroItem;
+    address zeroAddr;
+    emit ItemDeleted(itemIdToItem[_id]);
+    itemIdToItem[_id] = zeroItem;
+    itemIdToOwner[_id] = zeroAddr;
   }
 
 }

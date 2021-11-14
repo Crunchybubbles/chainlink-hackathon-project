@@ -9,6 +9,7 @@ contract GameBrain {
   address public owner;
   address public CreatureFactory;
   address public ItemFactory;
+  address public BattleLogic;
 
   LinkTokenInterface internal LINK;
 
@@ -23,6 +24,14 @@ contract GameBrain {
     if (msg.sender == CreatureFactory) {
       _;
     } else if (msg.sender == ItemFactory) {
+      _;
+    } else {
+      revert("not allowed");
+    }
+  }
+
+  modifier onlyBattleLogic {
+    if (msg.sender == BattleLogic) {
       _;
     } else {
       revert("not allowed");
@@ -56,11 +65,19 @@ contract GameBrain {
     linkBalance[_account] -= fee;
   }
 
+  function increaseBalance(address _account) external onlyBattleLogic {
+    linkBalance[_account] += fee;
+  }
+
   function setCreatureFactory(address _creatureFactory) public onlyOwner {
     CreatureFactory = _creatureFactory;
   }
 
   function setItemFactory(address _itemfacaddr) public onlyOwner {
     ItemFactory = _itemfacaddr;
+  }
+
+  function setBattleLogic(address _battleLogic) public onlyOwner {
+    BattleLogic = _battleLogic;
   }
 }
