@@ -25,6 +25,8 @@ contract GameBrain {
       _;
     } else if (msg.sender == ItemFactory) {
       _;
+    } else if (msg.sender == BattleLogic) {
+      _;
     } else {
       revert("not allowed");
     }

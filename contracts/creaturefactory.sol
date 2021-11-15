@@ -150,6 +150,7 @@ contract CreatureFactory is VRFConsumerBase {
 
   function setBattleLogic(address _battleLogic) public {
     require(msg.sender == owner);
+    BattleLogic = _battleLogic;
   }
 
   function deleteCreature(uint _id) external {
@@ -159,10 +160,10 @@ contract CreatureFactory is VRFConsumerBase {
     Creature memory toBeDeleted = idToCreature[_id];
     if (toBeDeleted.item.id != 0) {
       itemFac.deleteItem(toBeDeleted.item.id);
-    } else {
-      idToCreature[_id] = zeroCreature;
-      idToOwner[_id] = zeroAddr;
     }
+    idToCreature[_id] = zeroCreature;
+    idToOwner[_id] = zeroAddr;
+
     emit CreatureDeleted(toBeDeleted);
   }
 

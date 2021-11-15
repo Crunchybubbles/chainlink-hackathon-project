@@ -35,7 +35,7 @@ contract BattleLogic is VRFConsumerBase {
 
   address dev;
 
-  mapping(uint => mapping(uint => bool)) private isIdApprovedToFightOtherId;
+  mapping(uint => mapping(uint => bool)) public isIdApprovedToFightOtherId;
   mapping(uint => uint[2]) private battleIdToCreatures;
   mapping(bytes32 => uint) private RequestIdToBattleId;
 

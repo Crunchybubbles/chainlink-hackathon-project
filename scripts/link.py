@@ -6,7 +6,7 @@ test_acc = accounts[0]
 
 LINK_ADDR = '0xa36085F69e2889c224210F603D836748e7dC0088'
 # link = Contract(LINK_ADDR)
-test_contract_addr = '0xa52C5B91EF7eaa5280ff3931D4Aef4241732415e'
+test_contract_addr = '0x04c669A0E4B74CB281aF77a2bBC757D0A56570f3'
 test_contract = Contract(test_contract_addr)
 
 def approveLink(amount, to, token_addr, myacc):
