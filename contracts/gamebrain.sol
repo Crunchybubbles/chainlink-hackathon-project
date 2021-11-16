@@ -10,6 +10,7 @@ contract GameBrain {
   address public CreatureFactory;
   address public ItemFactory;
   address public BattleLogic;
+  address public PvE;
 
   LinkTokenInterface internal LINK;
 
@@ -26,6 +27,8 @@ contract GameBrain {
     } else if (msg.sender == ItemFactory) {
       _;
     } else if (msg.sender == BattleLogic) {
+      _;
+    } else if (msg.sender == PvE) {
       _;
     } else {
       revert("not allowed");

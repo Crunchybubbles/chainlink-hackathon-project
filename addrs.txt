@@ -1,5 +1,25 @@
-g = Contract("0xa52C5B91EF7eaa5280ff3931D4Aef4241732415e")
-i = Contract("0x4e3E42275639a5540852a2674A888f0A65887370")
-c = Contract("0x01710Aa5AAB12aD99EF15577d8ef00B5cbb11090")
-b = Contract("0x35cB5265d80Fa8f76068E218bAE7879cE7aA1b6D")
-h = Contract("0x3B2c31697457C61a4557CcF3be00751dCB561EC6")
+g = Contract("0x04c669A0E4B74CB281aF77a2bBC757D0A56570f3")
+i = Contract("0x6412309c1Cf6C056763D1F8Bbb4a3Bc7067F43Af")
+c = Contract("0x5072F5db0F8C9eAA0aBA8f41974592B86bB5AB2a")
+b = Contract("0xC20E08278aBaD88E682aDbCF85dD935A6Dc2fC2C")
+h = Contract("0xB1b870d75436263DceAEc512a77a231c003D5536")
+
+
+thoughts/things too add
+what to do with the health, attak, defense, speed tokens. somesort of crafting mechanics. item crafting / item stat improvement
+PvE
+when win a pvp fight reward with chance to mint item
+make the privilage to mint an item transferable between players
+make items transferable between players
+make creatures transferable between players
+game item market so people can list items/creatures/chance to mint items
+since gametokens are erc20 just rely on using a uniswapv2 pool. probably sushiswap
+who gets the winnings when both creatures die in pvp? dev? redistribute to all players?
+how does dev make money? small fee on market? <1%? or fixed rate?
+should dev make money? or fuck it and make it free except users providing link to play?
+for each stat. increase when a creature defeates a creature with stats higher than it.
+creature breeding? use vrf randomness to select which of the parents stats (for each stat) are passed to offspring
+item desturction to get the material tokens out
+creature sacrifice for materials?
+in pvp when speed tie make who goes first random on each turn. go down the random number and check if even or odd for next digit each turn
+track creature win count? pvp and pve?
