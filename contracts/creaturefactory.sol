@@ -41,6 +41,7 @@ contract CreatureFactory is VRFConsumerBase {
   itemFactoryInterface internal itemFac;
 
   address public BattleLogic;
+  address public PvE;
 
 
   uint public creatureCount;
@@ -49,7 +50,15 @@ contract CreatureFactory is VRFConsumerBase {
 
   event CreatureDeleted(Creature deadCreature);
 
-
+  modifier onlyBattleContracts {
+    if (msg.sender == BattleLogic) {
+      _;
+    } else if (msg.sender == PvE) {
+      _;
+    } else {
+      revert("not allowed");
+    }
+  }
 
   struct Creature {
     string name;
@@ -153,8 +162,12 @@ contract CreatureFactory is VRFConsumerBase {
     BattleLogic = _battleLogic;
   }
 
-  function deleteCreature(uint _id) external {
-    require(msg.sender == BattleLogic);
+  function setPvE(address _pve) public {
+    require(msg.sender == owner);
+    PvE = _pve;
+  }
+
+  function deleteCreature(uint _id) external onlyBattleContracts {
     Creature memory zeroCreature;
     address zeroAddr;
     Creature memory toBeDeleted = idToCreature[_id];

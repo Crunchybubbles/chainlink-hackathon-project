@@ -21,13 +21,19 @@ interface CreatureFactoryInterface {
   function deleteCreature(uint _id) external;
 }
 
+interface itemFactoryInterface {
+  function increaseMintableQuant(address _player, uint amount) external;
+}
+
 contract PvEfactory is VRFConsumerBase {
     bytes32 internal keyHash;
     uint internal fee;
 
     address public gameBrain;
+
     gameBrainInterface internal brain;
     CreatureFactoryInterface internal creatureFac;
+    itemFactoryInterface internal itemFac;
 
     mapping(bytes32 => address) public requestIdTorequester;
     mapping(bytes32 => uint) public requestIdToCreatureId;
@@ -51,13 +57,14 @@ contract PvEfactory is VRFConsumerBase {
       uint spd;
     }
 
-    constructor(address _vrfcoordinator, address _link, address _gamebrain, address _creatureFactory)
+    constructor(address _vrfcoordinator, address _link, address _gamebrain, address _creatureFactory, address _itemfacaddr)
       VRFConsumerBase(_vrfcoordinator, _link) public {
       keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
       fee = 100000000000000000;
       gameBrain = _gamebrain;
       brain = gameBrainInterface(_gamebrain);
       creatureFac = CreatureFactoryInterface(_creatureFactory);
+      itemFac = itemFactoryInterface(_itemfacaddr);
     }
 
     function randomPveFight(uint _creatureId) public returns (bytes32 requestId) {
@@ -152,6 +159,7 @@ contract PvEfactory is VRFConsumerBase {
       }
       if (winner.id != 0) {
         emit BattleWinner(winner);
+        itemFac.increaseMintableQuant(creatureFac.getCreatureOwner(winner.id), 1);
       }
 
       if (winner.id == 0) {
@@ -160,7 +168,7 @@ contract PvEfactory is VRFConsumerBase {
     }
 
     function pveCreature(uint randomness) private returns (Creature memory randoPveCreature) {
-      uint seed = randomness % 10000;
+      uint seed = randomness % 1000000000000;
       uint hp = ((seed / 1000) % 10) + 5;
       uint atk = ((seed / 100) % 10) + 1;
       uint def = ((seed / 10) % 10) + 1;
@@ -186,20 +194,20 @@ contract PvEfactory is VRFConsumerBase {
     }
 
     function _itemStats(uint seed) private pure returns(Item memory randoItem) {
-      seed = seed % 10000;
-      uint hp = seed / 10000;
+      seed = seed % 1000000000000;
+      uint hp = seed / 1000000000000;
       if (hp == 0) {
         hp = 1;
       }
-      uint atk = (seed / 1000) % 10;
+      uint atk = (seed / 100000000000) % 10;
       if (atk == 0) {
         atk = 1;
       }
-      uint def = (seed / 100) % 10;
+      uint def = (seed / 10000000000) % 10;
       if (def == 0) {
         def = 1;
       }
-      uint spd = (seed / 10) % 10;
+      uint spd = (seed / 1000000000) % 10;
       if (spd == 0) {
         spd = 1;
       }

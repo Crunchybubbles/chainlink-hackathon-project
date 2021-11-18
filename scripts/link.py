@@ -6,7 +6,7 @@ test_acc = accounts[0]
 
 LINK_ADDR = '0xa36085F69e2889c224210F603D836748e7dC0088'
 # link = Contract(LINK_ADDR)
-test_contract_addr = '0x04c669A0E4B74CB281aF77a2bBC757D0A56570f3'
+test_contract_addr = '0x70805C2944C14A2da6fB4c97277F14e47EEa77ec'
 test_contract = Contract(test_contract_addr)
 
 def approveLink(amount, to, token_addr, myacc):
@@ -31,7 +31,8 @@ def linkdeposit(amount, contract, token, myacc):
 
 
 def main():
-    amount = 100000000000000000
+    # amount = 2000000000000000000
+    amount = 100000000000000000 * 8
     linkdeposit(amount, test_contract_addr, LINK_ADDR, test_acc)
     print(tokenbalance(test_acc, LINK_ADDR))
     print(tokenbalance(test_contract, LINK_ADDR))

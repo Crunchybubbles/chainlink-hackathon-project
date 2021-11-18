@@ -32,6 +32,8 @@ contract ItemFactory is VRFConsumerBase {
 
   address public owner;
   address public creatureFactory;
+  address public battleLogic;
+  address public PvE;
 
 
   uint public rando;
@@ -82,8 +84,15 @@ contract ItemFactory is VRFConsumerBase {
     }
   }
 
-/* fix item to owner */
-
+  modifier onlyBattleContracts {
+    if (msg.sender == battleLogic) {
+      _;
+    } else if (msg.sender == PvE) {
+      _;
+    } else {
+      revert("not allowed");
+    }
+  }
 
   constructor(address _vrfcoordinator, address _link, address _gamebrain)
     VRFConsumerBase(_vrfcoordinator, _link) public {
@@ -115,8 +124,20 @@ contract ItemFactory is VRFConsumerBase {
     owner = _newOwner;
   }
 
-  function increaseMintableQuant(address _player) public {
-    playerToMintableQuant[msg.sender] += 1;
+  function setCreatureFactory(address _creatureFactory) public onlyOwner {
+    creatureFactory = _creatureFactory;
+  }
+
+  function setBattleLogic(address _battleLogic) public onlyOwner {
+    battleLogic = _battleLogic;
+  }
+
+  function setPvE(address _PvE) public onlyOwner {
+    PvE = _PvE;
+  }
+
+  function increaseMintableQuant(address _player, uint _amount) external onlyBattleContracts {
+    playerToMintableQuant[_player] = playerToMintableQuant[_player] + _amount;
   }
 
 
@@ -246,10 +267,6 @@ contract ItemFactory is VRFConsumerBase {
 
   function unequip(uint _id) external onlyCreatureFac {
     itemIdToisEquiped[_id] = false;
-  }
-
-  function setCreatureFactory(address _creatureFactory) public onlyOwner {
-    creatureFactory = _creatureFactory;
   }
 
   function deleteItem(uint _id) external onlyCreatureFac {

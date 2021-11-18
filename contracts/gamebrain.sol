@@ -85,4 +85,8 @@ contract GameBrain {
   function setBattleLogic(address _battleLogic) public onlyOwner {
     BattleLogic = _battleLogic;
   }
+
+  function setPvE(address _PvE) public onlyOwner {
+    PvE = _PvE;
+  }
 }

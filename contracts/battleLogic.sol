@@ -22,6 +22,10 @@ interface CreatureFactoryInterface {
   function deleteCreature(uint _id) external;
 }
 
+interface itemFactoryInterface {
+  function increaseMintableQuant(address _player, uint amount) external;
+}
+
 contract BattleLogic is VRFConsumerBase {
 
   bytes32 internal keyHash;
@@ -30,6 +34,7 @@ contract BattleLogic is VRFConsumerBase {
   address internal gameBrain;
   gameBrainInterface internal brain;
   CreatureFactoryInterface internal creatureFac;
+  itemFactoryInterface internal itemFac;
 
   uint battleId;
 
@@ -52,13 +57,14 @@ contract BattleLogic is VRFConsumerBase {
 
 
 
-  constructor(address _vrfcoordinator, address _link, address _gamebrain, address _creatureFactory)
+  constructor(address _vrfcoordinator, address _link, address _gamebrain, address _creatureFactory, address _itemfacaddr)
     VRFConsumerBase(_vrfcoordinator, _link) public {
     keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
     fee = 100000000000000000;
     gameBrain = _gamebrain;
     brain = gameBrainInterface(_gamebrain);
     creatureFac = CreatureFactoryInterface(_creatureFactory);
+    itemFac = itemFactoryInterface(_itemfacaddr);
     battleId = 1;
     dev = msg.sender;
     }
@@ -157,11 +163,15 @@ contract BattleLogic is VRFConsumerBase {
       }
       if (winner.id == creature1.id) {
         creatureFac.deleteCreature(creature2.id);
-        brain.increaseBalance(creatureFac.getCreatureOwner(winner.id));
+        address creatureOwner = creatureFac.getCreatureOwner(creature1.id);
+        brain.increaseBalance(creatureOwner);
+        itemFac.increaseMintableQuant(creatureOwner, 1);
       }
       if (winner.id == creature2.id) {
         creatureFac.deleteCreature(creature1.id);
-        brain.increaseBalance(creatureFac.getCreatureOwner(winner.id));
+        address creatureOwner = creatureFac.getCreatureOwner(creature2.id);
+        brain.increaseBalance(creatureOwner);
+        itemFac.increaseMintableQuant(creatureOwner, 1);
       }
       if (winner.id == 0) {
         creatureFac.deleteCreature(creature1.id);
