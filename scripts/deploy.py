@@ -52,13 +52,13 @@ def main():
 
     fee = 100000000000000000
     amount = 100000000000000000000
-    approveLink(fee * 12, gameBrain.address, link_addr, test_acc)
-    gameBrain.depositLink(fee * 12, {"from": test_acc})
+    approveLink(fee * 40, gameBrain.address, link_addr, test_acc)
+    gameBrain.depositLink(fee * 40, {"from": test_acc})
 
     gameBrain.approveLink(amount, creatureFactory.address, {"from": test_acc})
     gameBrain.approveLink(amount, itemFactory.address, {"from": test_acc})
     gameBrain.approveLink(amount, battleLogic.address, {"from": test_acc})
     gameBrain.approveLink(amount, pvE.address, {"from": test_acc})
 
-    for i in range(5):
-        creatureFactory.createRandomCreature({"from": test_acc})
+    # for i in range(5):
+    #     creatureFactory.createRandomCreature({"from": test_acc})
