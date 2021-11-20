@@ -37,6 +37,7 @@ contract PvEfactory is VRFConsumerBase {
 
     mapping(bytes32 => address) public requestIdTorequester;
     mapping(bytes32 => uint) public requestIdToCreatureId;
+    mapping(uint => uint) public creatureIdToWinCount;
 
     event CreatureDeleted(Creature deadCreature);
     event BattleWinner(Creature winner);
@@ -57,10 +58,10 @@ contract PvEfactory is VRFConsumerBase {
       uint spd;
     }
 
-    constructor(address _vrfcoordinator, address _link, address _gamebrain, address _creatureFactory, address _itemfacaddr)
+    constructor(address _vrfcoordinator, address _link, uint _fee, address _gamebrain, address _creatureFactory, address _itemfacaddr)
       VRFConsumerBase(_vrfcoordinator, _link) public {
       keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
-      fee = 100000000000000000;
+      fee = _fee;
       gameBrain = _gamebrain;
       brain = gameBrainInterface(_gamebrain);
       creatureFac = CreatureFactoryInterface(_creatureFactory);
@@ -160,6 +161,7 @@ contract PvEfactory is VRFConsumerBase {
       if (winner.id != 0) {
         emit BattleWinner(winner);
         itemFac.increaseMintableQuant(creatureFac.getCreatureOwner(winner.id), 1);
+        creatureIdToWinCount[winner.id] += 1;
       }
 
       if (winner.id == 0) {

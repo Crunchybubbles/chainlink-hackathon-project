@@ -43,10 +43,10 @@ contract GameBrain {
     }
   }
 
-  constructor(address _link) public {
+  constructor(address _link, uint _fee) public {
     owner = msg.sender;
     LINK = LinkTokenInterface(_link);
-    fee = 100000000000000000;
+    fee = _fee;
   }
 
   function changeOwner(address _newOwner) public onlyOwner {

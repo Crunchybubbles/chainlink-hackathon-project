@@ -43,6 +43,8 @@ contract BattleLogic is VRFConsumerBase {
   mapping(uint => mapping(uint => bool)) public isIdApprovedToFightOtherId;
   mapping(uint => uint[2]) private battleIdToCreatures;
   mapping(bytes32 => uint) private RequestIdToBattleId;
+  mapping(uint => uint) public creatureIdToWinCount;
+
 
   event BattleWinner(Creature winner);
 
@@ -57,10 +59,10 @@ contract BattleLogic is VRFConsumerBase {
 
 
 
-  constructor(address _vrfcoordinator, address _link, address _gamebrain, address _creatureFactory, address _itemfacaddr)
+  constructor(address _vrfcoordinator, address _link, uint _fee, address _gamebrain, address _creatureFactory, address _itemfacaddr)
     VRFConsumerBase(_vrfcoordinator, _link) public {
     keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
-    fee = 100000000000000000;
+    fee = _fee;
     gameBrain = _gamebrain;
     brain = gameBrainInterface(_gamebrain);
     creatureFac = CreatureFactoryInterface(_creatureFactory);
@@ -153,7 +155,7 @@ contract BattleLogic is VRFConsumerBase {
             creature2.hp -= dmg1;
           }
         }
-        if (turncount == 10) {
+        if (turncount == 20) {
           break;
         }
         turncount++;
@@ -166,12 +168,14 @@ contract BattleLogic is VRFConsumerBase {
         address creatureOwner = creatureFac.getCreatureOwner(creature1.id);
         brain.increaseBalance(creatureOwner);
         itemFac.increaseMintableQuant(creatureOwner, 1);
+        creatureIdToWinCount[winner.id] += 1;
       }
       if (winner.id == creature2.id) {
         creatureFac.deleteCreature(creature1.id);
         address creatureOwner = creatureFac.getCreatureOwner(creature2.id);
         brain.increaseBalance(creatureOwner);
         itemFac.increaseMintableQuant(creatureOwner, 1);
+        creatureIdToWinCount[winner.id] += 1;
       }
       if (winner.id == 0) {
         creatureFac.deleteCreature(creature1.id);

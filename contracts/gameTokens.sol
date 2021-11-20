@@ -17,6 +17,10 @@ contract HealthToken is ERC20 {
   function mintToken(address _player, uint _amount) external onlyItemFactory {
     _mint(_player, _amount);
   }
+
+  function burnTokens(address _player, uint _amount) external onlyItemFactory {
+    _burn(_player, _amount);
+  }
 }
 
 contract AttackToken is ERC20 {
@@ -33,6 +37,10 @@ contract AttackToken is ERC20 {
 
   function mintToken(address _player, uint _amount) external onlyItemFactory {
     _mint(_player, _amount);
+  }
+
+  function burnTokens(address _player, uint _amount) external onlyItemFactory {
+    _burn(_player, _amount);
   }
 }
 
@@ -51,6 +59,10 @@ contract DefenseToken is ERC20 {
   function mintToken(address _player, uint _amount) external onlyItemFactory {
     _mint(_player, _amount);
   }
+
+  function burnTokens(address _player, uint _amount) external onlyItemFactory {
+    _burn(_player, _amount);
+  }
 }
 
 contract SpeedToken is ERC20 {
@@ -67,5 +79,9 @@ contract SpeedToken is ERC20 {
 
   function mintToken(address _player, uint _amount) external onlyItemFactory {
     _mint(_player, _amount);
+  }
+
+  function burnTokens(address _player, uint _amount) external onlyItemFactory {
+    _burn(_player, _amount);
   }
 }

@@ -15,6 +15,10 @@ interface gameBrainInterface {
 
 interface gameTokens {
   function mintToken(address _player, uint _amount) external;
+
+  function burnTokens(address _player, uint _amount) external;
+
+  function balanceOf(address _player) external returns (uint amount);
 }
 
 contract ItemFactory is VRFConsumerBase {
@@ -94,10 +98,10 @@ contract ItemFactory is VRFConsumerBase {
     }
   }
 
-  constructor(address _vrfcoordinator, address _link, address _gamebrain)
+  constructor(address _vrfcoordinator, address _link, uint _fee, address _gamebrain)
     VRFConsumerBase(_vrfcoordinator, _link) public {
     keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
-    fee = 100000000000000000;
+    fee = _fee;
     itemCount = 1;
     gameBrain = _gamebrain;
     brain = gameBrainInterface(_gamebrain);
@@ -138,6 +142,17 @@ contract ItemFactory is VRFConsumerBase {
 
   function increaseMintableQuant(address _player, uint _amount) external onlyBattleContracts {
     playerToMintableQuant[_player] = playerToMintableQuant[_player] + _amount;
+  }
+
+  function transferItemMint(address _from, address _to, uint _amount) public {
+    require(playerToMintableQuant[_from] >= _amount && _from == msg.sender);
+    playerToMintableQuant[_from] = playerToMintableQuant[_from] - _amount;
+    playerToMintableQuant[_to] = playerToMintableQuant[_to] + _amount;
+  }
+
+  function transferItem(address _to, uint _id) public {
+    require(itemIdToOwner[_id] == msg.sender);
+    itemIdToOwner[_id] = _to;
   }
 
 
@@ -275,6 +290,37 @@ contract ItemFactory is VRFConsumerBase {
     emit ItemDeleted(itemIdToItem[_id]);
     itemIdToItem[_id] = zeroItem;
     itemIdToOwner[_id] = zeroAddr;
+  }
+
+  function deconstructItem(uint _id) public {
+    require(itemIdToOwner[_id] == msg.sender && itemIdToisEquiped[_id] == false);
+    Item memory zeroItem;
+    address zeroAddr;
+    Item memory item = itemIdToItem[_id];
+    uint hp = item.hp;
+    uint atk = item.atk;
+    uint def = item.def;
+    uint spd = item.spd;
+    itemIdToItem[_id] = zeroItem;
+    itemIdToOwner[_id] = zeroAddr;
+    HealthToken.mintToken(msg.sender, hp);
+    AttackToken.mintToken(msg.sender, atk);
+    DefenseToken.mintToken(msg.sender, def);
+    SpeedToken.mintToken(msg.sender, spd);
+  }
+
+  function upgradeItem(uint _id, uint _hptokens, uint _atktokens, uint _deftokens, uint _spdtokens) public {
+    require(itemIdToOwner[_id] == msg.sender && HealthToken.balanceOf(msg.sender) >= _hptokens && AttackToken.balanceOf(msg.sender) >= _atktokens && DefenseToken.balanceOf(msg.sender) >= _deftokens && SpeedToken.balanceOf(msg.sender) >= _spdtokens);
+    Item memory item = itemIdToItem[_id];
+    HealthToken.burnTokens(msg.sender, _hptokens);
+    AttackToken.burnTokens(msg.sender, _atktokens);
+    DefenseToken.burnTokens(msg.sender, _deftokens);
+    SpeedToken.burnTokens(msg.sender, _spdtokens);
+    item.hp += _hptokens;
+    item.atk += _atktokens;
+    item.def += _deftokens;
+    item.spd += _spdtokens;
+    itemIdToItem[_id] = item;
   }
 
 }

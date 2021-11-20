@@ -80,10 +80,10 @@ contract CreatureFactory is VRFConsumerBase {
   }
 
 
-  constructor(address _vrfcoordinator, address _link, address _gamebrain, address _itemfacaddr)
+  constructor(address _vrfcoordinator, address _link, uint _fee, address _gamebrain, address _itemfacaddr)
     VRFConsumerBase(_vrfcoordinator, _link) public {
     keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
-    fee = 100000000000000000;
+    fee = _fee;
     creatureCount = 1;
     gameBrain = _gamebrain;
     brain = gameBrainInterface(_gamebrain);
@@ -178,6 +178,11 @@ contract CreatureFactory is VRFConsumerBase {
     idToOwner[_id] = zeroAddr;
 
     emit CreatureDeleted(toBeDeleted);
+  }
+
+  function transferCreature(address _to, uint _id) public {
+    require(idToOwner[_id] == msg.sender);
+    idToOwner[_id] = _to;
   }
 
 }

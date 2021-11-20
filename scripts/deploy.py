@@ -11,19 +11,14 @@ def approveLink(amount, to, token_addr, myacc):
     tx.wait(1)
     return tx
 
-def linkdeposit(amount, contract, token, myacc):
-    approveLink(amount, contract, token, myacc)
-    depo_tx = gameBrain.depositLink(amount, {"from": myacc})
-    depo_tx.wait(1)
-    return depo_tx
-
 def main():
+    fee = 100000000000000000
     test_acc = accounts.load("testacc")
-    gameBrain = GameBrain.deploy(link_addr, {"from": test_acc})
-    itemFactory = ItemFactory.deploy(vrf, link_addr, gameBrain.address, {"from": test_acc})
-    creatureFactory = CreatureFactory.deploy(vrf, link_addr, gameBrain.address, itemFactory.address, {"from": test_acc})
-    battleLogic = BattleLogic.deploy(vrf, link_addr, gameBrain.address, creatureFactory.address, itemFactory.address, {"from": test_acc})
-    pvE = PvEfactory.deploy(vrf, link_addr, gameBrain.address, creatureFactory.address, itemFactory.address, {"from": test_acc})
+    gameBrain = GameBrain.deploy(link_addr, fee {"from": test_acc})
+    itemFactory = ItemFactory.deploy(vrf, link_addr, fee, gameBrain.address, {"from": test_acc})
+    creatureFactory = CreatureFactory.deploy(vrf, link_addr, fee, gameBrain.address, itemFactory.address, {"from": test_acc})
+    battleLogic = BattleLogic.deploy(vrf, link_addr, fee, gameBrain.address, creatureFactory.address, itemFactory.address, {"from": test_acc})
+    pvE = PvEfactory.deploy(vrf, link_addr, fee, gameBrain.address, creatureFactory.address, itemFactory.address, {"from": test_acc})
 
     healthToken = HealthToken.deploy(itemFactory.address, {"from": test_acc})
     attackToken = AttackToken.deploy(itemFactory.address, {"from": test_acc})
@@ -43,17 +38,10 @@ def main():
     itemFactory.setBattleLogic(battleLogic.address, {"from": test_acc})
     itemFactory.setPvE(pvE.address, {"from": test_acc})
 
-
     creatureFactory.setBattleLogic(battleLogic.address, {"from": test_acc})
     creatureFactory.setPvE(pvE.address, {"from": test_acc})
 
-
-
-
-    fee = 100000000000000000
     amount = 100000000000000000000
-    approveLink(fee * 40, gameBrain.address, link_addr, test_acc)
-    gameBrain.depositLink(fee * 40, {"from": test_acc})
 
     gameBrain.approveLink(amount, creatureFactory.address, {"from": test_acc})
     gameBrain.approveLink(amount, itemFactory.address, {"from": test_acc})
