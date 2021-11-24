@@ -161,7 +161,7 @@ contract PvEfactory is VRFConsumerBase {
       if (winner.id != 0) {
         emit BattleWinner(winner);
         itemFac.increaseMintableQuant(creatureFac.getCreatureOwner(winner.id), 1);
-        creatureIdToWinCount[winner.id] += 1;
+        creatureIdToWinCount[winner.id] = creatureIdToWinCount[winner.id] + 1;
       }
 
       if (winner.id == 0) {

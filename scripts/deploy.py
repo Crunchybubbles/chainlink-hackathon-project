@@ -14,7 +14,7 @@ def approveLink(amount, to, token_addr, myacc):
 def main():
     fee = 100000000000000000
     test_acc = accounts.load("testacc")
-    gameBrain = GameBrain.deploy(link_addr, fee {"from": test_acc})
+    gameBrain = GameBrain.deploy(link_addr, fee, {"from": test_acc})
     itemFactory = ItemFactory.deploy(vrf, link_addr, fee, gameBrain.address, {"from": test_acc})
     creatureFactory = CreatureFactory.deploy(vrf, link_addr, fee, gameBrain.address, itemFactory.address, {"from": test_acc})
     battleLogic = BattleLogic.deploy(vrf, link_addr, fee, gameBrain.address, creatureFactory.address, itemFactory.address, {"from": test_acc})

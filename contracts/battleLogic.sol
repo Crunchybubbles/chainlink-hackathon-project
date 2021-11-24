@@ -168,14 +168,14 @@ contract BattleLogic is VRFConsumerBase {
         address creatureOwner = creatureFac.getCreatureOwner(creature1.id);
         brain.increaseBalance(creatureOwner);
         itemFac.increaseMintableQuant(creatureOwner, 1);
-        creatureIdToWinCount[winner.id] += 1;
+        creatureIdToWinCount[winner.id] = creatureIdToWinCount[winner.id] + 1;
       }
       if (winner.id == creature2.id) {
         creatureFac.deleteCreature(creature1.id);
         address creatureOwner = creatureFac.getCreatureOwner(creature2.id);
         brain.increaseBalance(creatureOwner);
         itemFac.increaseMintableQuant(creatureOwner, 1);
-        creatureIdToWinCount[winner.id] += 1;
+        creatureIdToWinCount[winner.id] = creatureIdToWinCount[winner.id] + 1;
       }
       if (winner.id == 0) {
         creatureFac.deleteCreature(creature1.id);

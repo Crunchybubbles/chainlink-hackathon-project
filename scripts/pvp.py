@@ -17,7 +17,6 @@ def main():
     for i in range(20):
         print(f"{creaturefactory.idToCreature(i + 21)}")
 
-
     goOn = True
     index1 = 21
     index2 = 22
