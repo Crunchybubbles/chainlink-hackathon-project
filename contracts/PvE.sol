@@ -58,9 +58,9 @@ contract PvEfactory is VRFConsumerBase {
       uint spd;
     }
 
-    constructor(address _vrfcoordinator, address _link, uint _fee, address _gamebrain, address _creatureFactory, address _itemfacaddr)
+    constructor(address _vrfcoordinator, address _link, uint _fee, bytes32 _keyhash, address _gamebrain, address _creatureFactory, address _itemfacaddr)
       VRFConsumerBase(_vrfcoordinator, _link) public {
-      keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
+      keyHash = _keyhash;
       fee = _fee;
       gameBrain = _gamebrain;
       brain = gameBrainInterface(_gamebrain);
@@ -122,7 +122,7 @@ contract PvEfactory is VRFConsumerBase {
             creature2.hp -= dmg1;
           }
           if (creature2.atk > creature1.def) {
-            dmg2 = creature2.atk - creature1.atk;
+            dmg2 = creature2.atk - creature1.def;
           }
           if (dmg2 > creature1.hp) {
             creature1.hp = 0;
@@ -133,7 +133,7 @@ contract PvEfactory is VRFConsumerBase {
           }
         } else {
           if (creature2.atk > creature1.def) {
-            dmg2 = creature2.atk - creature1.atk;
+            dmg2 = creature2.atk - creature1.def;
           }
           if (dmg2 > creature1.hp) {
             creature1.hp = 0;
@@ -159,9 +159,9 @@ contract PvEfactory is VRFConsumerBase {
         turncount++;
       }
       if (winner.id != 0) {
-        emit BattleWinner(winner);
-        itemFac.increaseMintableQuant(creatureFac.getCreatureOwner(winner.id), 1);
-        creatureIdToWinCount[winner.id] = creatureIdToWinCount[winner.id] + 1;
+        emit BattleWinner(creature1);
+        itemFac.increaseMintableQuant(creatureFac.getCreatureOwner(creature1.id), 1);
+        creatureIdToWinCount[creature1.id] = creatureIdToWinCount[creature1.id] + 1;
       }
 
       if (winner.id == 0) {
@@ -169,7 +169,7 @@ contract PvEfactory is VRFConsumerBase {
       }
     }
 
-    function pveCreature(uint randomness) private returns (Creature memory randoPveCreature) {
+    function pveCreature(uint randomness) private pure returns (Creature memory randoPveCreature) {
       uint seed = randomness % 1000000000000;
       uint hp = ((seed / 1000) % 10) + 5;
       uint atk = ((seed / 100) % 10) + 1;
@@ -178,7 +178,7 @@ contract PvEfactory is VRFConsumerBase {
       randoPveCreature = Creature("", 0, hp, atk, def, spd);
     }
 
-    function pveItem(uint randomness) private returns (Item memory randoPveItem) {
+    function pveItem(uint randomness) private pure returns (Item memory randoPveItem) {
       uint tier = _tier(randomness);
       if (tier == 0) {
         randoPveItem = Item(0,0,0,0);

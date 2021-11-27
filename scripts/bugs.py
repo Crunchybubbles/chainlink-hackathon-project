@@ -1,4 +1,5 @@
 import brownie
+import time
 from brownie import Contract, accounts
 
 vrf = "0x8C7382F9D8f56b33781fE506E897a4F1e2d17255"
@@ -14,22 +15,19 @@ atktoken = Contract("0x2023EAa14c5c428cD0808f792a9924093188A76D")
 deftoken = Contract("0xD8C7B51B698eb170E8b0eB839BC6e2F259470152")
 spdtoken = Contract("0x3A099f1e0850Bc2c219a9855D108cA25163285A9")
 
-
-
+# was a bug in pvelogic and battlelogic but that bug has now been squashed
 def main():
-    # for i in range(20):
-    #     creaturefactory.createRandomCreature({"from": accounts[0]})
-
-    # for i in range(20):
-    #     print(f"{creaturefactory.idToCreature(i + 21)}")
-
-    goOn = True
-    index1 = 101
-    index2 = 102
-    while goOn:
-        print(f"index1 {index1}, index2 {index2}")
-        battlelogic.approveFight(index1, index2, {"from": accounts[0]})
-        battlelogic.approveFight(index2, index1, {"from": accounts[0]})
-        battlelogic.initiateBattle(accounts[0], index1, accounts[0], index2, {"from": accounts[0]})
-        index1 += 2
-        index2 += 2
+    errorCount = 0
+    successCount = 0
+    for i in range(1, creaturefactory.creatureCount()):
+        cret = creaturefactory.idToCreature(i)
+        if cret[1] != 0:
+            wins = pvelogic.creatureIdToWinCount(i)
+            if wins == 0:
+                errorcount += 1
+            if wins == 1:
+                successCount += 1
+        if cret[1] == 0:
+            successCount +=1
+    print(f"error count {errorCount}")
+    print(f"success count {successCount} ")

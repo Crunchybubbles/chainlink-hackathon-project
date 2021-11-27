@@ -80,9 +80,9 @@ contract CreatureFactory is VRFConsumerBase {
   }
 
 
-  constructor(address _vrfcoordinator, address _link, uint _fee, address _gamebrain, address _itemfacaddr)
+  constructor(address _vrfcoordinator, address _link, uint _fee, bytes32 _keyhash, address _gamebrain, address _itemfacaddr)
     VRFConsumerBase(_vrfcoordinator, _link) public {
-    keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
+    keyHash = _keyhash;
     fee = _fee;
     creatureCount = 1;
     gameBrain = _gamebrain;

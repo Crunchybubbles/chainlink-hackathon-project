@@ -98,9 +98,9 @@ contract ItemFactory is VRFConsumerBase {
     }
   }
 
-  constructor(address _vrfcoordinator, address _link, uint _fee, address _gamebrain)
+  constructor(address _vrfcoordinator, address _link, uint _fee, bytes32 _keyhash, address _gamebrain)
     VRFConsumerBase(_vrfcoordinator, _link) public {
-    keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
+    keyHash = _keyhash;
     fee = _fee;
     itemCount = 1;
     gameBrain = _gamebrain;
@@ -212,8 +212,6 @@ contract ItemFactory is VRFConsumerBase {
 
     randoItem = Item(0,hp, atk, def, spd);
   }
-
-  /* too many non zero tier items being generated out of 10 attempts 7 lead to items */
 
   function _tier(uint seed) private pure returns (uint tier) {
     seed = (seed / 1000000000) % 1000;

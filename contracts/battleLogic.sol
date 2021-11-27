@@ -59,9 +59,9 @@ contract BattleLogic is VRFConsumerBase {
 
 
 
-  constructor(address _vrfcoordinator, address _link, uint _fee, address _gamebrain, address _creatureFactory, address _itemfacaddr)
+  constructor(address _vrfcoordinator, address _link, uint _fee, bytes32 _keyhash, address _gamebrain, address _creatureFactory, address _itemfacaddr)
     VRFConsumerBase(_vrfcoordinator, _link) public {
-    keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
+    keyHash = _keyhash;
     fee = _fee;
     gameBrain = _gamebrain;
     brain = gameBrainInterface(_gamebrain);
@@ -124,7 +124,7 @@ contract BattleLogic is VRFConsumerBase {
             creature2.hp -= dmg1;
           }
           if (creature2.atk > creature1.def) {
-            dmg2 = creature2.atk - creature1.atk;
+            dmg2 = creature2.atk - creature1.def;
           }
           if (dmg2 > creature1.hp) {
             creature1.hp = 0;
@@ -135,7 +135,7 @@ contract BattleLogic is VRFConsumerBase {
           }
         } else {
           if (creature2.atk > creature1.def) {
-            dmg2 = creature2.atk - creature1.atk;
+            dmg2 = creature2.atk - creature1.def;
           }
           if (dmg2 > creature1.hp) {
             creature1.hp = 0;
@@ -168,14 +168,14 @@ contract BattleLogic is VRFConsumerBase {
         address creatureOwner = creatureFac.getCreatureOwner(creature1.id);
         brain.increaseBalance(creatureOwner);
         itemFac.increaseMintableQuant(creatureOwner, 1);
-        creatureIdToWinCount[winner.id] = creatureIdToWinCount[winner.id] + 1;
+        creatureIdToWinCount[creature1.id] = creatureIdToWinCount[creature1.id] + 1;
       }
       if (winner.id == creature2.id) {
         creatureFac.deleteCreature(creature1.id);
         address creatureOwner = creatureFac.getCreatureOwner(creature2.id);
         brain.increaseBalance(creatureOwner);
         itemFac.increaseMintableQuant(creatureOwner, 1);
-        creatureIdToWinCount[winner.id] = creatureIdToWinCount[winner.id] + 1;
+        creatureIdToWinCount[creature2.id] = creatureIdToWinCount[creature2.id] + 1;
       }
       if (winner.id == 0) {
         creatureFac.deleteCreature(creature1.id);

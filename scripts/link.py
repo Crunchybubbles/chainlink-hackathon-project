@@ -4,9 +4,9 @@ from brownie import Contract, accounts, interface
 # test_acc = accounts.load("testacc")
 test_acc = accounts[0]
 
-LINK_ADDR = '0xa36085F69e2889c224210F603D836748e7dC0088'
+LINK_ADDR = '0x326C977E6efc84E512bB9C30f76E30c160eD06FB'
 # link = Contract(LINK_ADDR)
-test_contract_addr = '0x10479593B261a7a0e699034BeFE248d65920F5a4'
+test_contract_addr = '0x4B38Ba757376f5924b034aB80F6fA7b0c67aDd3c'
 test_contract = Contract(test_contract_addr)
 
 def approveLink(amount, to, token_addr, myacc):

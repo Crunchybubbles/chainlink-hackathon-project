@@ -2,18 +2,29 @@ import brownie
 import time
 from brownie import Contract, accounts
 
-vrf = "0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9"
+vrf = "0x8C7382F9D8f56b33781fE506E897a4F1e2d17255"
 
-gamebrain = Contract("0x10479593B261a7a0e699034BeFE248d65920F5a4")
-itemfactory = Contract("0xccE956C45665F3B75fF72137aACF6280e7f0A83C")
-creaturefactory = Contract("0xeE4de4C33A0beB83A6AEd8b84Ece0993D2cbDfEd")
-battlelogic = Contract("0x44e9d88F388f1282087B41fdA5DbcCCb9424C315")
-pvelogic = Contract("0xf5692c189d63ED5a7E591BE73F1bEb639035443d")
+gamebrain = Contract("0x4B38Ba757376f5924b034aB80F6fA7b0c67aDd3c")
+itemfactory = Contract("0x24361ecaf63ac897cbB585997B91cD217eEc9B54")
+creaturefactory = Contract("0xb9Febd5D49F4CEc8B474aEc52C5831d26DD4524A")
+battlelogic = Contract("0xD5748582428dD991836999d399f4E04ABFa92E58")
+pvelogic = Contract("0x680b5e1FbB72dB95B9a3247A59e553678E7F02d3")
 
-hptoken = Contract("0xd62FB78aC0140280D6f5b74baB758079A685E6C0")
-atktoken = Contract("0xD70a83cD3495380C06e45CeFAc71133b156c0079")
-deftoken = Contract("0x3A2A6b2E6214D1A930584EcD3bDE32372bE00447")
-spdtoken = Contract("0xdE3191c1088A03DFe0c3455Bb8364060c6aec098")
+hptoken = Contract("0xFA179d83f8511E6b9117CcFC43Af86Bc1e4B50a3")
+atktoken = Contract("0x2023EAa14c5c428cD0808f792a9924093188A76D")
+deftoken = Contract("0xD8C7B51B698eb170E8b0eB839BC6e2F259470152")
+spdtoken = Contract("0x3A099f1e0850Bc2c219a9855D108cA25163285A9")
+
+# gamebrain = Contract("0xE67ae7DC5636d5Cd2466Abc23Defb80621f19243")
+# itemfactory = Contract("0x1628353d0a064d20634f7b173A69464174Fd5BF1")
+# creaturefactory = Contract("0x80c0B5CDd71D10dDbBAac85d8206B0bDCf38a9dF")
+# battlelogic = Contract("0x9791116BF0455c97f8C7C8c785158bd03A071C79")
+# pvelogic = Contract("0xcDE50a456C822f045E37489e2a677b5DD3B63Db2")
+#
+# hptoken = Contract("0x04bC405B12e5D3B521f84007dC7419677DC65E7f")
+# atktoken = Contract("0x4A5C764C120eE4B55EeDcb4d9a88F4a1CfC2FC6b")
+# deftoken = Contract("0x9cCB2a8E8Efc5dD358b9895EdFa627bdb4513701")
+# spdtoken = Contract("0x5153a32079DBA7Bb9C06d89eCdcAFB0182af2be3")
 
 
 
