@@ -26,6 +26,7 @@ def main():
     goOn = True
     index1 = 101
     index2 = 102
+    stop = creaturefactory.creatureCount()
     while goOn:
         print(f"index1 {index1}, index2 {index2}")
         battlelogic.approveFight(index1, index2, {"from": accounts[0]})
@@ -33,3 +34,5 @@ def main():
         battlelogic.initiateBattle(accounts[0], index1, accounts[0], index2, {"from": accounts[0]})
         index1 += 2
         index2 += 2
+        if index1 == stop:
+            goOn = False
